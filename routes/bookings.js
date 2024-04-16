@@ -3,6 +3,7 @@ var router = express.Router();
 require('../models/connection');
 const Trip = require('../models/trips');
 const Booking = require('../models/bookings')
+const CartItem = require('../models/cartItems')
 const moment = require('moment')
 
 router.get("/", (req, res) => {
@@ -10,19 +11,34 @@ router.get("/", (req, res) => {
     .then(data => {res.json({ bookings: data })});
 });
 
-router.post('/add/:tripId', (req, res) => {
-    Trip.findOne({_id: req.params.tripId})
+router.post('/', (req, res) => {
+    CartItem.find()
     .then(data => {
-        if(data) {
-            newBooking = new Booking({trip: req.params.tripId})
-            newBooking.save()
-            .then(res.json({result: 'Trip successfully booked'}))
+        if(data[0]){
+            console.log(data)
+            data.forEach((cartItem) => {
+                let newBooking = new Booking ({trip: cartItem.trip})
+                newBooking.save()
+                .then(() => CartItem.deleteOne({_id: cartItem.id}))
+                .then(() => console.log('Cart Item deleted'))
+            })
+            res.json({result: 'All bookings saved'})
         } else {
-            res.json({error: 'Trip not found'})
-        }
+            res.json({error: 'No trips added to cart'})
+        }        
     })
-}
-)
+})
+    // Trip.findOne({_id: req.params.tripId})
+    // .then(data => {
+    //     if(data) {
+    //         newBooking = new Booking({trip: req.params.tripId})
+    //         newBooking.save()
+    //         .then(res.json({result: 'Trip successfully booked'}))
+    //     } else {
+    //         res.json({error: 'Trip not found'})
+    //     }
+    // })
+
 
 router.delete("/:id", (req, res) => {
     Booking.findOne({_id: req.params.id})
