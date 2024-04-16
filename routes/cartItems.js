@@ -10,15 +10,16 @@ router.get("/", (req, res) => {
     .then(data => {res.json({ cartItems: data })});
 });
 
-router.get('/add/:tripId', (req, res) => {
+router.post('/add/:tripId', (req, res) => {
     Trip.findOne({_id: req.params.tripId})
     .then(data => {
         if(data) {
-            const newCartItem = new CartItem({tripId: req.params.tripId})
+            console.log(data)
+            const newCartItem = new CartItem({trip: data['_id']})
             newCartItem.save()
-            .then(res.json({result: 'Trip successfully added to cart'}))
+            .then(() => {res.json({result: 'Trip successfully added to cart', newCartItem: newCartItem})})
         } else {
-            res.json({error: 'Cart item not found'})
+            res.json({error: 'Trip not found'})
         }
     })
 }
@@ -29,7 +30,7 @@ router.delete("/:id", (req, res) => {
     .then(data => {
         if (data) {
             CartItem.deleteOne({_id: data.id})
-            .then(CartItem.find().populate('trip'))
+            .then(() => CartItem.find().populate('trip'))
             .then(data => res.json({ cartItems: data }))
         } else {
             res.json({ error: "Cart item not found" });
