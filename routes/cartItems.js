@@ -7,7 +7,10 @@ const moment = require('moment')
 
 router.get("/", (req, res) => {
     CartItem.find().populate('trip')
-    .then(data => {res.json({ cartItems: data })});
+    .then(data => {
+        console.log(data)
+        res.json({ cartItems: data })
+    });
 });
 
 router.post('/add/:tripId', (req, res) => {
