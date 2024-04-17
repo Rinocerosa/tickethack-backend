@@ -6,7 +6,7 @@ const Trip = require('../models/trips');
 const moment = require('moment')
 
 router.get("/", (req, res) => {
-    CartItem.find()
+    CartItem.find().populate('trip')
     .then(data => {res.json({ cartItems: data })});
 });
 
